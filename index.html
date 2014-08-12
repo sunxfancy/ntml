@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
+    </head>
+    <body>
+		<div id='show'></div>
+
+		<script type="text/javascript" src="js/jquery.js"></script>
+
+    	<script type="text/javascript" src="temp/template.js"></script>
+         <script type="text/javascript" src="src/template-syntax.js"></script>
+    	<script type="text/javascript" src="src/ntml.js"></script>
+        <script type="text/javascript">
+            function GetXmlComplete(html,ntml) {
+                $('#show').html(html);
+            }
+            $(document).ready(function(){  
+                nt.load('main.ntml',GetXmlComplete);
+            });
+        </script>
+    </body>
+</html>

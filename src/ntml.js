@@ -2,7 +2,7 @@
 * @Author: sxf
 * @Date:   2014-08-10 11:55:38
 * @Last Modified by:   sxf
-* @Last Modified time: 2014-08-10 22:32:53
+* @Last Modified time: 2014-08-11 00:16:59
 */
 
 
@@ -35,6 +35,7 @@ var NTML = function () {
 NTML.prototype = {
 	data : null,
 	html : '',
+	callback : null,
 
 	parse : function(ntml_text) {
 	    this.data = ntml_text;
@@ -58,6 +59,7 @@ NTML.prototype = {
 		var attr = node.prop("attributes");
 
 		var data = {};
+		data['content'] = ''; //不要忘记元素的初始化，这是注册对象的必要步骤。
 		var childList = node.contents();
 		for (var i = 0; i < childList.length; i++) {
 			var child = childList[i];
@@ -66,13 +68,16 @@ NTML.prototype = {
 			var childTag = $child.prop("tagName");
 			if (childTag === undefined || childTag == null) 
 			{
-				data['content'] += $child.text();	
+				var ret_text = $child.text();
+				if (ret_text==null || ret_text === undefined) 
+					ret_text = '';
+				data['content'] += ret_text;	
 			} else {
 				// console.log(childTag);
 				if (childTag.toLowerCase() == 'params')
 				{
 					var childAttr = $child.prop("attributes");
-					data.push(childAttr);
+					this.make_data(data,childAttr);
 
 				} else {
 					// console.log(childTag);
@@ -126,7 +131,10 @@ NTML.prototype = {
 		if (tag=== undefined ||tag == null ) 
 		{
 			// console.log(node.text());
-			return node.text();
+			var ret_text = node.text();
+			if (ret_text==null || ret_text === undefined) 
+				ret_text = '';
+			return ret_text;
 		}
 		if (((tag.length>3) && (tag.substring(0,3)=='nt-'))
 			||(!is_html_tag(tag))) 
@@ -147,6 +155,13 @@ NTML.prototype = {
 		return ans;
 	},
 
+	make_data : function (data ,hashmap) {
+		for (var i = hashmap.length - 1; i >= 0; i--) {
+			var p = hashmap[i];
+			data[p.nodeName] = p.nodeValue;
+		};
+	},
+
 	make_html_header : function (tag, attr) {
 		var text = '<';
 		text += tag; 
@@ -162,41 +177,25 @@ NTML.prototype = {
 		return '</' + tag + '>\n';
 	},
 
+	
 
-	load : function (url) {
-		$.get(url, function(ntml){
-		});
+	load : function (geturl,func) {
+		this.callback = func;
+        $.ajax({
+            url: geturl,
+            type: 'GET',
+            dataType: 'text',
+            timeout: 1000,  //设定超时
+            cache: true,   //缓存
+            error: function(xml) {
+                alert("加载XML文档出错!");
+            },
+            success: loaddone   //设置成功后回调函数
+        });
 	}
 };
-
-	// child.each(function (i,ele) {
-	// 	$('#show').append($(ele).prop("tagName"));
-	// 	$('#show').append($(ele).text());
-
-	// });
-
-
-function GetXmlComplete(xml) {
-	var nt = new NTML();
-	$('#show').html(nt.parse(xml));
-}
-
-
-$(document).ready(function(){  
-	// $.get('test.xml',function(xml) {
-	// 	// alert(xml);
-	// });
-    $.ajax({
-        url: 'test.xml',
-        type: 'GET',
-        dataType: 'text',
-        timeout: 1000,  //设定超时
-        cache: true,   //缓存
-        error: function(xml) {
-            alert("加载XML文档出错!");
-        },
-        success: GetXmlComplete   //设置成功后回调函数
-    });
-});
-
-
+var nt = new NTML();
+function loaddone(xml) {
+	nt.parse(xml);
+	nt.callback(nt.html,xml);
+};

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<ntml>
+<nt-container>
+	<nt-layout-8-4>
+		<a-left>
+			<nt-article>
+				<a-title>关于nt语法的一些介绍</a-title>
+				<!-- <a-date>2014-8-10</a-date> -->
+				<a-content>
+					下面我们来简要介绍一下ntml这种标记式语言。
+
+				</a-content>
+			</nt-article>
+		</a-left>
+		<a-right>
+			<nt-loginform>
+				<params action='#' method='get' />
+			</nt-loginform>
+		</a-right>
+	</nt-layout-8-4>
+</nt-container>
+</ntml>
